@@ -27,10 +27,12 @@ class GPUMonitor:
             return list(self._samples)
 
     def _run(self) -> None:
+        initialized = False
         try:
             import pynvml  # type: ignore[import-not-found]
 
             pynvml.nvmlInit()
+            initialized = True
             handle = pynvml.nvmlDeviceGetHandleByIndex(0)
 
             while not self._stop_event.is_set():
@@ -43,9 +45,14 @@ class GPUMonitor:
                 }
                 with self._lock:
                     self._samples.append(sample)
-                time.sleep(self.sample_interval_sec)
-
-            pynvml.nvmlShutdown()
+                if self._stop_event.wait(self.sample_interval_sec):
+                    break
         except Exception:
             # Keep benchmark running even when telemetry setup fails.
             return
+        finally:
+            if initialized:
+                try:
+                    pynvml.nvmlShutdown()
+                except Exception:
+                    pass

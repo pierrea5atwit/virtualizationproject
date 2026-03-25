@@ -159,6 +159,13 @@ CSV files include:
 
 * `results/summary.csv`
 * `results/workers.csv`
+* `results/hardware.csv`
+
+Hardware guardrail:
+
+* Startup probes NVIDIA hardware mode via NVML
+* `physical` config is blocked unless non-virtualized NVIDIA hardware is verified
+* Detected mode and validation outcome are always logged to `results/hardware.csv`
 
 Each run logs:
 

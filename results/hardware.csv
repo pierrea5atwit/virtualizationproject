@@ -1,0 +1,3 @@
+timestamp,environment,has_nvidia_gpu,gpu_name,virtualization_mode,source,validation_ok,validation_reason,error
+1774418112,physical,False,,no_gpu,import,False,physical config requires a detectable NVIDIA GPU,No module named 'pynvml'
+1774418149,virtual,False,,no_gpu,import,True,virtual config allowed on all hardware profiles,No module named 'pynvml'

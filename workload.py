@@ -30,8 +30,12 @@ def run_worker(worker_id: int, config: Dict[str, Any]) -> Dict[str, Any]:
     n_features = int(workload_cfg["n_features"])
     batch_size = int(workload_cfg["batch_size"])
     k_neighbors = int(workload_cfg["k_neighbors"])
-    inference_loops = int(workload_cfg["inference_loops"])
+    inference_loops = int(workload_cfg.get("inference_loops", 0))
     warmup_seconds = float(experiment_cfg.get("warmup_seconds", 0))
+    duration_seconds = float(experiment_cfg.get("duration_seconds", 0))
+
+    if duration_seconds <= 0 and inference_loops <= 0:
+        raise ValueError("Set experiment.duration_seconds > 0 or workload.inference_loops > 0")
 
     # Build synthetic dataset directly on GPU memory.
     x_train = cp.random.random((n_samples, n_features), dtype=cp.float32)
@@ -47,9 +51,16 @@ def run_worker(worker_id: int, config: Dict[str, Any]) -> Dict[str, Any]:
 
     latencies_ms: List[float] = []
     total_requests = 0
+    loop_count = 0
     loop_start = time.perf_counter()
 
-    for _ in range(inference_loops):
+    while True:
+        elapsed = time.perf_counter() - loop_start
+        if duration_seconds > 0 and elapsed >= duration_seconds:
+            break
+        if inference_loops > 0 and loop_count >= inference_loops:
+            break
+
         q = cp.random.random((batch_size, n_features), dtype=cp.float32)
         t0 = time.perf_counter()
         model.kneighbors(q, return_distance=False)
@@ -58,6 +69,7 @@ def run_worker(worker_id: int, config: Dict[str, Any]) -> Dict[str, Any]:
 
         latencies_ms.append((t1 - t0) * 1000.0)
         total_requests += batch_size
+        loop_count += 1
 
     total_seconds = max(time.perf_counter() - loop_start, 1e-9)
 
@@ -68,4 +80,5 @@ def run_worker(worker_id: int, config: Dict[str, Any]) -> Dict[str, Any]:
         "throughput_rps": float(total_requests / total_seconds),
         "total_requests": total_requests,
         "duration_seconds": total_seconds,
+        "completed_loops": loop_count,
     }

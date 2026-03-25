@@ -12,6 +12,7 @@ class CSVExperimentLogger:
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.summary_path = self.output_dir / "summary.csv"
         self.workers_path = self.output_dir / "workers.csv"
+        self.hardware_path = self.output_dir / "hardware.csv"
 
         if not self.summary_path.exists():
             self._write_header(
@@ -41,6 +42,22 @@ class CSVExperimentLogger:
                     "throughput_rps",
                     "duration_seconds",
                     "total_requests",
+                ],
+            )
+
+        if not self.hardware_path.exists():
+            self._write_header(
+                self.hardware_path,
+                [
+                    "timestamp",
+                    "environment",
+                    "has_nvidia_gpu",
+                    "gpu_name",
+                    "virtualization_mode",
+                    "source",
+                    "validation_ok",
+                    "validation_reason",
+                    "error",
                 ],
             )
 
@@ -83,3 +100,20 @@ class CSVExperimentLogger:
                         row["total_requests"],
                     ]
                 )
+
+    def log_hardware(self, row: Dict[str, Any]) -> None:
+        with self.hardware_path.open("a", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerow(
+                [
+                    int(time.time()),
+                    row["environment"],
+                    row["has_nvidia_gpu"],
+                    row["gpu_name"],
+                    row["virtualization_mode"],
+                    row["source"],
+                    row["validation_ok"],
+                    row["validation_reason"],
+                    row["error"],
+                ]
+            )
