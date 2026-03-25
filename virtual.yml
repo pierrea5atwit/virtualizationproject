@@ -1,0 +1,23 @@
+environment: "virtual"   # or "physical"
+
+experiment:
+  duration_seconds: 60
+  warmup_seconds: 5
+  repeat_runs: 3
+
+workload:
+  n_samples: 200000
+  n_features: 64
+  batch_size: 1000
+  k_neighbors: 5
+  inference_loops: 500
+
+concurrency:
+  num_workers: 4
+
+monitoring:
+  sample_interval_sec: 1
+
+logging:
+  output_dir: "results/"
+  log_interval: 1

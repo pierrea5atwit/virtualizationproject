@@ -67,3 +67,96 @@ variance, and improve training efficiency in multi-tenant AI environments?
 Success Statement:
 
 The project will be considered successful if the accelerator-aware control framework reduces training throughput variance by at least 30% in multi-tenant virtual GPU environments while maintaining telemetry overhead below 3% CPU utilization. Additionally, the system must detect GPU contention events with ≥85% accuracy, attribute performance bottlenecks correctly in ≥80% of experiments, and maintain scaling efficiency above 70%
+
+# GPU Contention Benchmark (cuML + NVML)
+
+## Overview
+
+This project benchmarks GPU inference performance under concurrent workloads to study resource contention and scaling behavior.
+
+It compares performance across:
+
+* Virtualized GPU environments (vGPU)
+* Physical GPU hardware
+
+## Features
+
+* GPU-accelerated kNN inference using RAPIDS cuML
+* Multiprocessing workload generation
+* Real-time GPU telemetry via NVML
+* Structured logging for analysis
+* Configurable experiment parameters
+
+## Setup
+
+### 1. Environment
+
+Install RAPIDS (cuML) using Conda:
+
+```
+conda create -n rapids-env -c rapidsai -c nvidia -c conda-forge \
+    rapids=24.02 python=3.10 cuda-version=12.0
+conda activate rapids-env
+```
+
+Install Python dependencies:
+
+```
+pip install -r requirements.txt
+```
+
+### 2. Verify GPU Access
+
+```
+nvidia-smi
+```
+
+## Running Experiments
+
+### Virtual GPU
+
+```
+python main.py --config configs/virtual.yaml
+```
+
+### Physical GPU
+
+```
+python main.py --config configs/physical.yaml
+```
+
+## Output
+
+Results are written to:
+
+```
+/results/
+```
+
+Each run logs:
+
+* latency (ms)
+* throughput (requests/sec)
+* GPU utilization (%)
+* GPU memory usage (MB)
+
+## Experiment Design
+
+We evaluate:
+
+* Throughput scaling vs concurrency (knee curve)
+* Throughput variance across runs
+* GPU utilization vs performance
+* Behavior under contention
+
+## Notes
+
+* All experiments use identical code paths
+* Only configuration differs between environments
+* Repeat runs are required for statistical validity
+
+## Future Work
+
+* Adaptive scheduling based on telemetry
+* Multi-GPU scaling
+* Real-time monitoring dashboard
