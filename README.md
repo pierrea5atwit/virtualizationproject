@@ -87,6 +87,28 @@ It compares performance across:
 * Structured logging for analysis
 * Configurable experiment parameters
 
+## Project Structure
+
+```
+project/
+    main.py
+    config.py
+    workload.py
+    monitor.py
+    logger.py
+    runner.py
+
+    configs/
+        virtual.yaml
+        physical.yaml
+
+    results/
+    logs/
+
+    requirements.txt
+    README.md
+```
+
 ## Setup
 
 ### 1. Environment
@@ -130,8 +152,13 @@ python main.py --config configs/physical.yaml
 Results are written to:
 
 ```
-/results/
+results/
 ```
+
+CSV files include:
+
+* `results/summary.csv`
+* `results/workers.csv`
 
 Each run logs:
 

@@ -1,4 +1,4 @@
-environment: "virtual"   # or "physical"
+environment: "virtual"
 
 experiment:
   duration_seconds: 60

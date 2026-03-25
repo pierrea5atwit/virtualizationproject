@@ -8,5 +8,8 @@ matplotlib==3.8.4
 # GPU monitoring
 pynvml==11.5.0
 
+# Config parsing
+PyYAML==6.0.2
+
 # RAPIDS cuML (installed separately via conda or system)
 # NOTE: Do NOT pip install cuML directly on your system
